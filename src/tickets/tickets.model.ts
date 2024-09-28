@@ -14,9 +14,9 @@ import {
 
 @Table
 export class Ticket extends Model {
-  @Column(DataType.UUID)
   @PrimaryKey
   @Default(DataType.UUIDV4)
+  @Column(DataType.UUID)
   id: string;
 
   @Column(DataType.INTEGER)
@@ -26,8 +26,8 @@ export class Ticket extends Model {
   @Index
   dispatchTime: Date;
 
-  @Column(DataType.STRING) //make enum?
   @Default('soil')
+  @Column(DataType.STRING) //make enum?
   material: string;
 
   @ForeignKey(() => Truck)

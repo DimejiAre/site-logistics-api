@@ -9,19 +9,20 @@ import {
   Unique,
   AllowNull,
   PrimaryKey,
-  Default
+  Default,
 } from 'sequelize-typescript';
 
 @Table
 export class Site extends Model {
-  @Column(DataType.UUID)
   @PrimaryKey
+  @AllowNull(false)
   @Default(DataType.UUIDV4)
+  @Column(DataType.UUID)
   id: string;
 
-  @Column(DataType.STRING)
   @Unique
   @AllowNull(false)
+  @Column(DataType.STRING)
   name: string;
 
   @Column(DataType.STRING)

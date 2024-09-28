@@ -18,14 +18,15 @@ import {
 
 @Table
 export class Truck extends Model {
-  @Column(DataType.UUID)
   @PrimaryKey
   @Default(DataType.UUIDV4)
+  @AllowNull(false)
+  @Column(DataType.UUID)
   id: string;
 
-  @Column(DataType.STRING)
   @Unique
   @AllowNull(false)
+  @Column(DataType.STRING)
   license: string;
 
   @ForeignKey(() => Site)
