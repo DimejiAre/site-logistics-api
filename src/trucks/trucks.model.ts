@@ -10,19 +10,19 @@ import {
   DataType,
   PrimaryKey,
   ForeignKey,
-  Default,
   Unique,
   AllowNull,
   Index,
+  AutoIncrement,
 } from 'sequelize-typescript';
 
 @Table
 export class Truck extends Model {
   @PrimaryKey
-  @Default(DataType.UUIDV4)
+  @AutoIncrement
   @AllowNull(false)
-  @Column(DataType.UUID)
-  id: string;
+  @Column(DataType.INTEGER)
+  id: number;
 
   @Unique
   @AllowNull(false)

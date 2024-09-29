@@ -6,5 +6,6 @@ import { Ticket } from './tickets.model';
   imports: [SequelizeModule.forFeature([Ticket])],
   providers: [],
   controllers: [],
+  exports: [SequelizeModule],
 })
-export class SitesModule {}
+export class TicketsModule {}

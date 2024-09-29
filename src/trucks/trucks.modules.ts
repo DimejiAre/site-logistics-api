@@ -6,5 +6,6 @@ import { Truck } from './trucks.model';
   imports: [SequelizeModule.forFeature([Truck])],
   providers: [],
   controllers: [],
+  exports: [SequelizeModule],
 })
-export class SitesModule {}
+export class TrucksModule {}

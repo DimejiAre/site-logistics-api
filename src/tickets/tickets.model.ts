@@ -10,14 +10,15 @@ import {
   PrimaryKey,
   ForeignKey,
   Index,
+  AutoIncrement,
 } from 'sequelize-typescript';
 
 @Table
 export class Ticket extends Model {
   @PrimaryKey
-  @Default(DataType.UUIDV4)
-  @Column(DataType.UUID)
-  id: string;
+  @AutoIncrement
+  @Column(DataType.INTEGER)
+  id: number;
 
   @Column(DataType.INTEGER)
   ticketNumber: number;

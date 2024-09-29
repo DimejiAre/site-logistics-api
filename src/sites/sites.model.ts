@@ -6,21 +6,19 @@ import {
   Table,
   HasMany,
   DataType,
-  Unique,
   AllowNull,
   PrimaryKey,
-  Default,
+  AutoIncrement,
 } from 'sequelize-typescript';
 
 @Table
 export class Site extends Model {
   @PrimaryKey
   @AllowNull(false)
-  @Default(DataType.UUIDV4)
-  @Column(DataType.UUID)
-  id: string;
+  @AutoIncrement
+  @Column(DataType.INTEGER)
+  id: number;
 
-  @Unique
   @AllowNull(false)
   @Column(DataType.STRING)
   name: string;

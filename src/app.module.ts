@@ -6,22 +6,26 @@ import { Site } from './sites/sites.model';
 import { Truck } from './trucks/trucks.model';
 import { Ticket } from './tickets/tickets.model';
 import { ConfigModule } from '@nestjs/config';
+import { SitesModule } from './sites/sites.modules';
+import { TrucksModule } from './trucks/trucks.modules';
+import { TicketsModule } from './tickets/tickets.modules';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({ isGlobal: true }),
     SequelizeModule.forRoot({
       dialect: 'postgres',
       host: process.env.DB_HOST,
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      autoLoadModels: true,
-      synchronize: true,
+      // autoLoadModels: true,
+      logging: false,
       models: [Site, Truck, Ticket],
-      // ports : 5432
-      // sync: { force: true }
     }),
+    SitesModule,
+    TrucksModule,
+    TicketsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

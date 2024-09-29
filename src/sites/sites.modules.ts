@@ -6,5 +6,6 @@ import { Site } from './sites.model';
   imports: [SequelizeModule.forFeature([Site])],
   providers: [],
   controllers: [],
+  exports: [SequelizeModule],
 })
 export class SitesModule {}
