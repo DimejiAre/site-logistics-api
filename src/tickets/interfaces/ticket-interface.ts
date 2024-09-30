@@ -1,7 +1,9 @@
-export interface Ticket {
+export interface TicketResponse {
   id: number;
   ticketNumber: number;
   dispatchTime: Date;
-  truckId: number;
   material: string;
+  truckLicense: string;
+  siteName: string;
+  siteId: number;
 }

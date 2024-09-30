@@ -1,4 +1,5 @@
 import { Truck } from '../trucks/trucks.model';
+import { Site } from '../sites/sites.model';
 
 import {
   Column,
@@ -38,11 +39,14 @@ export class Ticket extends Model {
   @Column(DataType.INTEGER)
   truckId: number;
 
-  @ForeignKey(() => Truck)
+  @ForeignKey(() => Site)
   @Index
   @Column(DataType.INTEGER)
   siteId: number;
 
   @BelongsTo(() => Truck)
   truck: Truck;
+
+  @BelongsTo(() => Site)
+  site: Site;
 }

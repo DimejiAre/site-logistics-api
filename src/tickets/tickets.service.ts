@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Site } from '../sites/sites.model';
 import { Truck } from '../trucks/trucks.model';
 import { Ticket } from './tickets.model';
-import { Ticket as TicketInterface } from './interfaces/ticket-interface';
+import { TicketResponse } from './interfaces/ticket-interface';
 import { Sequelize } from 'sequelize-typescript';
 import { Op } from 'sequelize';
 import { CreateTicketDto } from './dto/create-ticket.dto';
@@ -19,12 +19,10 @@ export class TicketsService {
     private sequelize: Sequelize,
   ) {
     this.minDispatchIntervalMinutes =
-      parseInt(process.env.MIN_DISPATCH_INTERVAL_MINUTES) || 15;
+      parseInt(process.env.MIN_DISPATCH_INTERVAL_MINUTES, 10) || 15;
   }
 
-  async createTickets(
-    createTicketsDto: CreateTicketDto[],
-  ): Promise<TicketInterface[]> {
+  async createTickets(createTicketsDto: CreateTicketDto[]): Promise<Ticket[]> {
     const transaction = await this.sequelize.transaction();
 
     try {
@@ -113,5 +111,52 @@ export class TicketsService {
       await transaction.rollback();
       throw error;
     }
+  }
+
+  async findTickets(
+    siteIds?: number[],
+    startDate?: Date,
+    endDate?: Date,
+    page = 1,
+    limit = 100,
+  ): Promise<{ data: TicketResponse[]; count: number; totalPages: number }> {
+    const offset = (page - 1) * limit;
+
+    const where: any = {};
+
+    if (siteIds && siteIds.length > 0) {
+      where.siteId = siteIds;
+    }
+
+    if (startDate && endDate) {
+      where.dispatchTime = {
+        [Op.between]: [startDate, endDate],
+      };
+    }
+
+    const { rows, count } = await this.ticketModel.findAndCountAll({
+      where,
+      include: [
+        { model: Site, attributes: ['name'] },
+        { model: Truck, attributes: ['license'] },
+      ],
+      limit,
+      offset,
+      order: [['dispatchTime', 'DESC']],
+    });
+
+    const transformedRows = rows.map((ticket) => ({
+      id: ticket.id,
+      ticketNumber: ticket.ticketNumber,
+      dispatchTime: ticket.dispatchTime,
+      material: ticket.material,
+      siteName: ticket.site?.name,
+      siteId: ticket.siteId,
+      truckLicense: ticket.truck?.license,
+    }));
+
+    const totalPages = Math.ceil(count / limit);
+
+    return { data: transformedRows, count, totalPages };
   }
 }
