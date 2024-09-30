@@ -1,0 +1,117 @@
+import { Injectable, BadRequestException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/sequelize';
+import { Site } from '../sites/sites.model';
+import { Truck } from '../trucks/trucks.model';
+import { Ticket } from './tickets.model';
+import { Ticket as TicketInterface } from './interfaces/ticket-interface';
+import { Sequelize } from 'sequelize-typescript';
+import { Op } from 'sequelize';
+import { CreateTicketDto } from './dto/create-ticket.dto';
+
+@Injectable()
+export class TicketsService {
+  private readonly minDispatchIntervalMinutes: number;
+
+  constructor(
+    @InjectModel(Site) private siteModel: typeof Site,
+    @InjectModel(Truck) private truckModel: typeof Truck,
+    @InjectModel(Ticket) private ticketModel: typeof Ticket,
+    private sequelize: Sequelize,
+  ) {
+    this.minDispatchIntervalMinutes =
+      parseInt(process.env.MIN_DISPATCH_INTERVAL_MINUTES) || 15;
+  }
+
+  async createTickets(
+    createTicketsDto: CreateTicketDto[],
+  ): Promise<TicketInterface[]> {
+    const transaction = await this.sequelize.transaction();
+
+    try {
+      const tickets: Ticket[] = [];
+
+      for (const dto of createTicketsDto) {
+        const dispatchTime = new Date(dto.dispatchTime);
+
+        if (isNaN(dispatchTime.getTime())) {
+          throw new BadRequestException('Invalid dispatchTime date.');
+        }
+
+        const now = new Date();
+
+        if (
+          dispatchTime.getFullYear() !== now.getFullYear() ||
+          dispatchTime.getMonth() !== now.getMonth() ||
+          dispatchTime.getDate() !== now.getDate()
+        ) {
+          throw new BadRequestException(
+            'Dispatched time must be on the current day.',
+          );
+        }
+
+        const truck = await this.truckModel.findByPk(dto.truckId, {
+          transaction,
+        });
+
+        if (!truck) {
+          throw new BadRequestException(
+            `Truck with ID ${dto.truckId} does not exist.`,
+          );
+        }
+
+        const siteId = truck.siteId;
+
+        const minIntervalMs = this.minDispatchIntervalMinutes * 60 * 1000;
+        const minIntervalDate = new Date(
+          dispatchTime.getTime() - minIntervalMs,
+        );
+        const maxIntervalDate = new Date(
+          dispatchTime.getTime() + minIntervalMs,
+        );
+
+        const conflictingTicket = await this.ticketModel.findOne({
+          where: {
+            truckId: dto.truckId,
+            dispatchTime: {
+              [Op.between]: [minIntervalDate, maxIntervalDate],
+            },
+          },
+          transaction,
+        });
+
+        if (conflictingTicket) {
+          throw new BadRequestException(
+            `There must be at least ${this.minDispatchIntervalMinutes} minutes between dispatch times for the same truck.`,
+          );
+        }
+
+        const lastTicket = await this.ticketModel.findOne({
+          where: { siteId: siteId },
+          order: [['ticketNumber', 'DESC']],
+          transaction,
+        });
+
+        const ticketNumber = lastTicket ? lastTicket.ticketNumber + 1 : 1;
+
+        const ticket = await this.ticketModel.create(
+          {
+            ticketNumber,
+            material: dto.material,
+            dispatchTime,
+            truckId: dto.truckId,
+            siteId: siteId,
+          },
+          { transaction },
+        );
+
+        tickets.push(ticket);
+      }
+
+      await transaction.commit();
+      return tickets;
+    } catch (error) {
+      await transaction.rollback();
+      throw error;
+    }
+  }
+}

@@ -9,6 +9,8 @@ import { ConfigModule } from '@nestjs/config';
 import { SitesModule } from './sites/sites.modules';
 import { TrucksModule } from './trucks/trucks.modules';
 import { TicketsModule } from './tickets/tickets.modules';
+import { TicketsService } from './tickets/tickets.service';
+import { TicketsController } from './tickets/tickets.controller';
 
 @Module({
   imports: [
@@ -27,7 +29,7 @@ import { TicketsModule } from './tickets/tickets.modules';
     TrucksModule,
     TicketsModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, TicketsController],
+  providers: [AppService, TicketsService],
 })
 export class AppModule {}
