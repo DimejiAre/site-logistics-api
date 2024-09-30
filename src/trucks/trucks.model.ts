@@ -31,8 +31,9 @@ export class Truck extends Model {
 
   @ForeignKey(() => Site)
   @Index
-  @Column(DataType.UUID)
-  siteId: string;
+  @AllowNull(false)
+  @Column(DataType.INTEGER)
+  siteId: number;
 
   @BelongsTo(() => Site)
   site: Site;

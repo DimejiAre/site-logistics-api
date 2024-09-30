@@ -18,12 +18,22 @@ module.exports = {
       },
       material: {
         type: Sequelize.STRING,
+        allowNull: false,
         defaultValue: 'soil',
       },
       truckId: {
         type: Sequelize.INTEGER,
         references: {
           model: 'Trucks',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL',
+      },
+      siteId: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Sites',
           key: 'id',
         },
         onUpdate: 'CASCADE',

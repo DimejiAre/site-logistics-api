@@ -11,6 +11,7 @@ import {
   ForeignKey,
   Index,
   AutoIncrement,
+  AllowNull,
 } from 'sequelize-typescript';
 
 @Table
@@ -28,13 +29,19 @@ export class Ticket extends Model {
   dispatchTime: Date;
 
   @Default('soil')
+  @AllowNull(false)
   @Column(DataType.STRING) //make enum?
   material: string;
 
   @ForeignKey(() => Truck)
   @Index
-  @Column(DataType.UUID)
-  truckId: string;
+  @Column(DataType.INTEGER)
+  truckId: number;
+
+  @ForeignKey(() => Truck)
+  @Index
+  @Column(DataType.INTEGER)
+  siteId: number;
 
   @BelongsTo(() => Truck)
   truck: Truck;
