@@ -14,7 +14,7 @@ module.exports = {
       },
       dispatchTime: {
         type: Sequelize.DATE,
-        index: true,
+        allowNull: false,
       },
       material: {
         type: Sequelize.STRING,
@@ -50,9 +50,31 @@ module.exports = {
         defaultValue: Sequelize.literal('NOW()'),
       },
     });
+
+    await queryInterface.addIndex('Tickets', ['truckId', 'dispatchTime'], {
+      name: 'tickets_truck_dispatch_unique',
+      unique: true,
+    });
+
+    await queryInterface.addIndex('Tickets', ['siteId', 'dispatchTime'], {
+      name: 'tickets_site_dispatch_index',
+    });
+
+    await queryInterface.addIndex('Tickets', ['siteId'], {
+      name: 'tickets_site_id_index',
+    });
   },
 
   down: async (queryInterface) => {
+    await queryInterface.removeIndex(
+      'Tickets',
+      'tickets_truck_dispatch_unique',
+    );
+
+    await queryInterface.removeIndex('Tickets', 'tickets_site_dispatch_index');
+
+    await queryInterface.removeIndex('Tickets', 'tickets_site_id_index');
+
     await queryInterface.dropTable('Tickets');
   },
 };
