@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { TicketsController } from './tickets.controller';
 import { TicketsService } from './tickets.service';
 import { CreateTicketDto } from './dto/create-ticket.dto';
+import { GetTicketsDto } from './dto/get-tickets.dto';
 import { TicketResponse } from './interfaces/ticket-interface';
 import { Ticket } from './tickets.model';
 
@@ -77,15 +78,21 @@ describe('TicketsController', () => {
       count: number;
       totalPages: number;
     };
+    let getTicketsDto: GetTicketsDto;
     let startDate: string;
     let endDate: string;
 
     beforeEach(async () => {
-      const siteIds: string = '1,2';
       startDate = '2024-09-30T17:00:00.000Z';
       endDate = '2024-09-30T18:00:00.000Z';
-      const page: string = '1';
-      const limit: string = '10';
+
+      getTicketsDto = {
+        siteIds: [1, 2],
+        startDate,
+        endDate,
+        page: 1,
+        limit: 10,
+      };
 
       mockResponse = {
         data: [
@@ -95,7 +102,6 @@ describe('TicketsController', () => {
             dispatchTime: new Date(),
             material: 'soil',
             siteName: 'ZILCH',
-            siteId: 1,
             truckLicense: 'kdd7yh',
           } as TicketResponse,
         ],
@@ -105,13 +111,7 @@ describe('TicketsController', () => {
 
       mockTicketsService.findTickets.mockResolvedValue(mockResponse);
 
-      result = await controller.getTickets(
-        siteIds,
-        startDate,
-        endDate,
-        page,
-        limit,
-      );
+      result = await controller.getTickets(getTicketsDto);
     });
 
     it('should call TicketsService.findTickets with correct arguments in the right format', async () => {

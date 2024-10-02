@@ -7,7 +7,7 @@ import { Site } from '../sites/sites.model';
 import { Truck } from '../trucks/trucks.model';
 import { Ticket } from './tickets.model';
 import { CreateTicketDto } from './dto/create-ticket.dto';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, Logger } from '@nestjs/common';
 import { TicketResponse } from './interfaces/ticket-interface';
 
 describe('TicketsService', () => {
@@ -18,6 +18,9 @@ describe('TicketsService', () => {
   let sequelizeMock: any;
 
   beforeEach(async () => {
+    jest.spyOn(Logger.prototype, 'log').mockImplementation(() => {});
+    jest.spyOn(Logger.prototype, 'error').mockImplementation(() => {});
+
     siteModelMock = {
       findByPk: jest.fn(),
     };
@@ -168,7 +171,6 @@ describe('TicketsService', () => {
           dispatchTime: dispatchTime,
           material: 'soil',
           siteName: 'ZILCH',
-          siteId: 1,
           truckLicense: 'kdd7yh',
         } as TicketResponse,
       ],
