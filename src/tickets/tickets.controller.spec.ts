@@ -82,8 +82,8 @@ describe('TicketsController', () => {
 
     beforeEach(async () => {
       const siteIds: string = '1,2';
-      startDate = '2023-09-01';
-      endDate = '2023-09-30';
+      startDate = '2024-09-30T17:00:00.000Z';
+      endDate = '2024-09-30T18:00:00.000Z';
       const page: string = '1';
       const limit: string = '10';
 
