@@ -5,5 +5,4 @@ export interface TicketResponse {
   material: string;
   truckLicense: string;
   siteName: string;
-  siteId: number;
 }

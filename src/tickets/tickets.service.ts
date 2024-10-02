@@ -115,7 +115,7 @@ export class TicketsService {
       return tickets;
     } catch (error) {
       await transaction.rollback();
-      this.logger.error('Failed to create tickets', error.stack);
+      this.logger.error('Failed to create tickets', error);
       if (!(error instanceof BadRequestException)) {
         throw new InternalServerErrorException(
           'Failed to create tickets. Please try again later.',
@@ -165,7 +165,6 @@ export class TicketsService {
         dispatchTime: ticket.dispatchTime,
         material: ticket.material,
         siteName: ticket.site?.name,
-        siteId: ticket.siteId,
         truckLicense: ticket.truck?.license,
       }));
 
@@ -173,7 +172,7 @@ export class TicketsService {
 
       return { data: transformedRows, count, totalPages };
     } catch (error) {
-      this.logger.error('Failed to fetch tickets', error.stack);
+      this.logger.error('Failed to fetch tickets', error);
       throw new InternalServerErrorException(
         'Failed to fetch tickets. Please try again later.',
         error,
