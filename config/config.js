@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
-require('dotenv').config();
+require('dotenv').config(); // eslint-disable-line @typescript-eslint/no-require-imports
 
 module.exports = {
   development: {

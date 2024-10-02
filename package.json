@@ -28,6 +28,7 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "dotenv": "^16.4.5",
+    "jsonstream": "^1.0.3",
     "pg": "^8.13.0",
     "pg-hstore": "^2.3.4",
     "reflect-metadata": "^0.2.0",
