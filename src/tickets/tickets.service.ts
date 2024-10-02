@@ -1,4 +1,9 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Site } from '../sites/sites.model';
 import { Truck } from '../trucks/trucks.model';
@@ -10,6 +15,7 @@ import { CreateTicketDto } from './dto/create-ticket.dto';
 
 @Injectable()
 export class TicketsService {
+  private readonly logger = new Logger(TicketsService.name);
   private readonly minDispatchIntervalMinutes: number;
 
   constructor(
@@ -109,6 +115,13 @@ export class TicketsService {
       return tickets;
     } catch (error) {
       await transaction.rollback();
+      this.logger.error('Failed to create tickets', error.stack);
+      if (!(error instanceof BadRequestException)) {
+        throw new InternalServerErrorException(
+          'Failed to create tickets. Please try again later.',
+          error,
+        );
+      }
       throw error;
     }
   }
@@ -120,43 +133,51 @@ export class TicketsService {
     page = 1,
     limit = 100,
   ): Promise<{ data: TicketResponse[]; count: number; totalPages: number }> {
-    const offset = (page - 1) * limit;
+    try {
+      const offset = (page - 1) * limit;
 
-    const where: any = {};
+      const where: any = {};
 
-    if (siteIds && siteIds.length > 0) {
-      where.siteId = siteIds;
+      if (siteIds && siteIds.length > 0) {
+        where.siteId = siteIds;
+      }
+
+      if (startDate && endDate) {
+        where.dispatchTime = {
+          [Op.between]: [startDate, endDate],
+        };
+      }
+
+      const { rows, count } = await this.ticketModel.findAndCountAll({
+        where,
+        include: [
+          { model: Site, attributes: ['name'] },
+          { model: Truck, attributes: ['license'] },
+        ],
+        limit,
+        offset,
+        order: [['dispatchTime', 'DESC']],
+      });
+
+      const transformedRows = rows.map((ticket) => ({
+        id: ticket.id,
+        ticketNumber: ticket.ticketNumber,
+        dispatchTime: ticket.dispatchTime,
+        material: ticket.material,
+        siteName: ticket.site?.name,
+        siteId: ticket.siteId,
+        truckLicense: ticket.truck?.license,
+      }));
+
+      const totalPages = Math.ceil(count / limit);
+
+      return { data: transformedRows, count, totalPages };
+    } catch (error) {
+      this.logger.error('Failed to fetch tickets', error.stack);
+      throw new InternalServerErrorException(
+        'Failed to fetch tickets. Please try again later.',
+        error,
+      );
     }
-
-    if (startDate && endDate) {
-      where.dispatchTime = {
-        [Op.between]: [startDate, endDate],
-      };
-    }
-
-    const { rows, count } = await this.ticketModel.findAndCountAll({
-      where,
-      include: [
-        { model: Site, attributes: ['name'] },
-        { model: Truck, attributes: ['license'] },
-      ],
-      limit,
-      offset,
-      order: [['dispatchTime', 'DESC']],
-    });
-
-    const transformedRows = rows.map((ticket) => ({
-      id: ticket.id,
-      ticketNumber: ticket.ticketNumber,
-      dispatchTime: ticket.dispatchTime,
-      material: ticket.material,
-      siteName: ticket.site?.name,
-      siteId: ticket.siteId,
-      truckLicense: ticket.truck?.license,
-    }));
-
-    const totalPages = Math.ceil(count / limit);
-
-    return { data: transformedRows, count, totalPages };
   }
 }
