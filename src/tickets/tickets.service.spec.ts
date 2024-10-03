@@ -8,7 +8,10 @@ import { Truck } from '../trucks/trucks.model';
 import { Ticket } from './tickets.model';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { BadRequestException, Logger } from '@nestjs/common';
-import { TicketResponse } from './interfaces/ticket-interface';
+import {
+  TicketResponse,
+  CreateTicketsResponse,
+} from './interfaces/ticket-interface';
 
 describe('TicketsService', () => {
   let service: TicketsService;
@@ -33,6 +36,7 @@ describe('TicketsService', () => {
       findByPk: jest.fn(),
       findOne: jest.fn(),
       create: jest.fn(),
+      bulkCreate: jest.fn(),
       findAndCountAll: jest.fn(),
     };
 
@@ -69,9 +73,11 @@ describe('TicketsService', () => {
   });
 
   describe('createTickets', () => {
-    const dispatchTime = new Date().toISOString();
+    const now = new Date();
+    now.setHours(now.getHours() + 2);
+    const dispatchTime = now.toISOString();
     const truckId = 1;
-    const validCreateTicketDto: CreateTicketDto[] = [{ truckId, dispatchTime }];
+    const validCreateTicketDto: CreateTicketDto[] = [{ dispatchTime }];
     const ticket: Ticket = {
       id: 1,
       truckId: 1,
@@ -80,78 +86,117 @@ describe('TicketsService', () => {
       siteId: 1,
       ticketNumber: 1,
     } as Ticket;
+    const ticketCreationResponse: CreateTicketsResponse = {
+      createdCount: 1,
+      failedCount: 0,
+      failedTickets: [],
+    };
 
     it('should create tickets successfully with valid inputs', async () => {
       truckModelMock.findByPk.mockResolvedValueOnce({ siteId: 1 });
       ticketModelMock.findOne.mockResolvedValueOnce(null);
-      ticketModelMock.create.mockResolvedValueOnce(ticket);
+      ticketModelMock.bulkCreate.mockResolvedValueOnce([ticket]);
 
-      const result = await service.createTickets(validCreateTicketDto);
+      const result = await service.createTickets(truckId, validCreateTicketDto);
 
-      expect(result).toHaveLength(1);
-      expect(result[0]).toBe(ticket);
-      expect(ticketModelMock.create).toHaveBeenCalledWith(
-        expect.objectContaining({
-          ticketNumber: 1,
-          siteId: 1,
-          dispatchTime: new Date(dispatchTime),
-          truckId,
-        }),
+      expect(result).toEqual(ticketCreationResponse);
+      expect(ticketModelMock.bulkCreate).toHaveBeenCalledWith(
+        expect.arrayContaining([
+          expect.objectContaining({
+            ticketNumber: 1,
+            siteId: 1,
+            dispatchTime: new Date(dispatchTime),
+            truckId,
+          }),
+        ]),
         expect.anything(),
       );
     });
 
-    it('should throw BadRequestException for invalid dispatchTime', async () => {
-      const invalidDto = [{ truckId: 1, dispatchTime: 'invalid-date' }];
+    it('should fail with reason if invalid dispatchTime', async () => {
+      const invalidDto = [{ dispatchTime: 'invalid-date' }];
 
-      await expect(service.createTickets(invalidDto)).rejects.toThrow(
-        new BadRequestException('Invalid dispatchTime date.'),
-      );
+      truckModelMock.findByPk.mockResolvedValueOnce({ siteId: 1 });
+
+      const result = await service.createTickets(truckId, invalidDto);
+
+      expect(result).toEqual({
+        createdCount: 0,
+        failedCount: 1,
+        failedTickets: [
+          {
+            dto: { dispatchTime: 'invalid-date' },
+            reason: 'Invalid dispatchTime date.',
+          },
+        ],
+      });
     });
 
-    it('should throw BadRequestException for dispatchTime not on the current day', async () => {
+    it('should fail with reason if dispatchTime not on the current day', async () => {
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
-      const invalidDto = [{ truckId: 1, dispatchTime: tomorrow.toISOString() }];
+      const invalidDto = [{ dispatchTime: tomorrow.toISOString() }];
+      truckModelMock.findByPk.mockResolvedValueOnce({ siteId: 1 });
 
-      await expect(service.createTickets(invalidDto)).rejects.toThrow(
-        new BadRequestException('Dispatched time must be on the current day.'),
-      );
+      const result = await service.createTickets(truckId, invalidDto);
+
+      expect(result).toEqual({
+        createdCount: 0,
+        failedCount: 1,
+        failedTickets: [
+          {
+            dto: { dispatchTime: tomorrow.toISOString() },
+            reason: 'Dispatch time must be on the current day.',
+          },
+        ],
+      });
     });
 
     it('should throw BadRequestException if truck does not exist', async () => {
       truckModelMock.findByPk.mockResolvedValueOnce(null);
 
-      await expect(service.createTickets(validCreateTicketDto)).rejects.toThrow(
+      await expect(
+        service.createTickets(truckId, validCreateTicketDto),
+      ).rejects.toThrow(
         new BadRequestException('Truck with ID 1 does not exist.'),
       );
     });
 
-    it('should throw BadRequestException if conflicting ticket exists', async () => {
+    it('should fail with reason if conflicting ticket exists', async () => {
       truckModelMock.findByPk.mockResolvedValueOnce({ siteId: 1 });
-      ticketModelMock.findOne.mockResolvedValueOnce({ id: 1 });
+      // ticketModelMock.findOne.mockResolvedValueOnce({ id: 1 });
+      ticketModelMock.findOne.mockReturnValue({ id: 1 });
 
-      await expect(service.createTickets(validCreateTicketDto)).rejects.toThrow(
-        new BadRequestException(
-          'There must be at least 15 minutes between dispatch times for the same truck.',
-        ),
-      );
+      console.log(validCreateTicketDto);
+      const result = await service.createTickets(truckId, validCreateTicketDto);
+
+      expect(result).toEqual({
+        createdCount: 0,
+        failedCount: 1,
+        failedTickets: [
+          {
+            dto: validCreateTicketDto[0],
+            reason:
+              'There must be at least 15 minutes between dispatch times for the same truck.',
+          },
+        ],
+      });
     });
 
     it('should rollback transaction if an error occurs', async () => {
       truckModelMock.findByPk.mockResolvedValueOnce({ siteId: 1 });
       ticketModelMock.findOne.mockRejectedValueOnce(new Error());
 
-      await expect(service.createTickets(validCreateTicketDto)).rejects.toThrow(
-        Error,
-      );
+      await expect(
+        service.createTickets(truckId, validCreateTicketDto),
+      ).rejects.toThrow(Error);
 
       expect(sequelizeMock.transaction().rollback).toHaveBeenCalled();
     });
   });
 
   describe('findTickets', () => {
-    const dispatchTime = new Date('2024-09-30T18:00:00.000Z');
+    const dispatchTime = new Date();
     const mockTickets = [
       {
         id: 1,
@@ -170,6 +215,7 @@ describe('TicketsService', () => {
           ticketNumber: 1,
           dispatchTime: dispatchTime,
           material: 'soil',
+          siteId: 1,
           siteName: 'ZILCH',
           truckLicense: 'kdd7yh',
         } as TicketResponse,
@@ -186,8 +232,8 @@ describe('TicketsService', () => {
 
       const result = await service.findTickets(
         [1],
-        new Date('2024-09-30T17:00:00.000Z'),
-        new Date('2024-09-30T19:00:00.000Z'),
+        new Date(),
+        new Date(),
         1,
         10,
       );

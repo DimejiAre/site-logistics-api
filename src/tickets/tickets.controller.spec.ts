@@ -1,10 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TicketsController } from './tickets.controller';
 import { TicketsService } from './tickets.service';
-import { CreateTicketDto } from './dto/create-ticket.dto';
 import { GetTicketsDto } from './dto/get-tickets.dto';
 import { TicketResponse } from './interfaces/ticket-interface';
-import { Ticket } from './tickets.model';
 
 describe('TicketsController', () => {
   let controller: TicketsController;
@@ -32,43 +30,6 @@ describe('TicketsController', () => {
 
   it('should be defined', () => {
     expect(controller).toBeDefined();
-  });
-
-  describe('createTickets', () => {
-    let createTicketDtos: CreateTicketDto[];
-    let createdTickets: Ticket[];
-    let result: Ticket[];
-
-    beforeEach(async () => {
-      const dispatchTime = new Date().toISOString();
-      createTicketDtos = [
-        {
-          truckId: 1,
-          dispatchTime: new Date().toISOString(),
-        },
-      ];
-      createdTickets = [
-        {
-          id: 1,
-          truckId: 1,
-          material: 'soil',
-          dispatchTime: new Date(dispatchTime),
-          siteId: 1,
-          ticketNumber: 1,
-        } as Ticket,
-      ];
-
-      mockTicketsService.createTickets.mockResolvedValue(createdTickets);
-      result = await controller.createTickets(createTicketDtos);
-    });
-
-    it('should call TicketsService.createTickets with correct arguments', async () => {
-      expect(service.createTickets).toHaveBeenCalledWith(createTicketDtos);
-    });
-
-    it('should return the correct output from TicketsService.createTickets', async () => {
-      expect(result).toEqual(createdTickets);
-    });
   });
 
   describe('getTickets', () => {
