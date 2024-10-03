@@ -183,7 +183,7 @@ export class TicketsService {
       };
     }
 
-    if (dispatchTime < now) {
+    if (dispatchTime.getTime() < now.getTime()) {
       return {
         valid: false,
         reason: 'Dispatch time cannot be in the past.',

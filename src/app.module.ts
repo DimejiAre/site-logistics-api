@@ -11,6 +11,7 @@ import { TrucksModule } from './trucks/trucks.modules';
 import { TicketsModule } from './tickets/tickets.modules';
 import { TicketsService } from './tickets/tickets.service';
 import { TicketsController } from './tickets/tickets.controller';
+import { TrucksController } from './trucks/trucks.controller';
 
 @Module({
   imports: [
@@ -29,7 +30,7 @@ import { TicketsController } from './tickets/tickets.controller';
     TrucksModule,
     TicketsModule,
   ],
-  controllers: [AppController, TicketsController],
+  controllers: [AppController, TicketsController, TrucksController],
   providers: [AppService, TicketsService],
 })
 export class AppModule {}
