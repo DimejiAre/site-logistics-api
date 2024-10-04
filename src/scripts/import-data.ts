@@ -4,7 +4,7 @@ import { getModelToken } from '@nestjs/sequelize';
 import { Site } from '../sites/sites.model';
 import { Truck } from '../trucks/trucks.model';
 import * as fs from 'fs';
-const JSONStream = require('JSONStream'); // eslint-disable-line @typescript-eslint/no-require-imports
+import JSONStream from 'JSONStream';
 import { pipeline } from 'stream/promises';
 import { Sequelize } from 'sequelize-typescript';
 import { Logger } from '@nestjs/common';
