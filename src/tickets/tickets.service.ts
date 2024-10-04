@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  BadRequestException,
-  InternalServerErrorException,
-  Logger,
-} from '@nestjs/common';
+import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Site } from '../sites/sites.model';
 import { Truck } from '../trucks/trucks.model';
@@ -27,8 +22,10 @@ export class TicketsService {
     @InjectModel(Ticket) private ticketModel: typeof Ticket,
     private sequelize: Sequelize,
   ) {
-    this.minDispatchIntervalMinutes =
-      parseInt(process.env.MIN_DISPATCH_INTERVAL_MINUTES, 10) || 30;
+    this.minDispatchIntervalMinutes = parseInt(
+      process.env.MIN_DISPATCH_INTERVAL_MINUTES || '30',
+      10,
+    );
   }
 
   async createTickets(
@@ -52,6 +49,7 @@ export class TicketsService {
           `Truck with ID ${truckId} does not exist.`,
         );
       }
+
       const siteId = truck.siteId;
 
       const lastTicket = await this.ticketModel.findOne({
@@ -68,11 +66,9 @@ export class TicketsService {
           nextTicketNumber,
           truckId,
           siteId,
-          transaction,
         );
 
       if (validTickets.length === 0) {
-        await transaction.rollback();
         return {
           createdCount: 0,
           failedCount: failedTickets.length,
@@ -80,20 +76,30 @@ export class TicketsService {
         };
       }
 
-      const createdTickets = await this.ticketModel.bulkCreate(validTickets, {
-        transaction,
-      });
+      const batchSize = parseInt(process.env.BATCH_SIZE || '1000', 10);
+      let createdCount = 0;
+
+      for (let i = 0; i < validTickets.length; i += batchSize) {
+        const batch = validTickets.slice(i, i + batchSize);
+        const result = await this.ticketModel.bulkCreate(batch, {
+          transaction,
+        });
+        createdCount += result.length;
+      }
 
       await transaction.commit();
 
       return {
-        createdCount: createdTickets.length,
+        createdCount,
         failedCount: failedTickets.length,
         failedTickets,
       };
     } catch (error) {
       await transaction.rollback();
-      this.logger.error('Failed to create tickets', error);
+      this.logger.error(
+        `Failed to create tickets for truck ID ${truckId}. Rolling back transaction.`,
+        error,
+      );
       throw error;
     }
   }
@@ -187,7 +193,6 @@ export class TicketsService {
     lastTicketNumber: number,
     truckId: number,
     siteId: number,
-    transaction: any,
   ): Promise<{
     validTickets: Partial<Ticket>[];
     failedTickets: FailedTicket[];
@@ -222,7 +227,6 @@ export class TicketsService {
             ],
           },
         },
-        transaction,
       });
 
       if (conflictWithDB) {

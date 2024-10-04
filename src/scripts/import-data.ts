@@ -57,7 +57,7 @@ async function bootstrap() {
   const sequelize = app.get(Sequelize);
   const siteModel = app.get(getModelToken(Site));
   const truckModel = app.get(getModelToken(Truck));
-  const batchSize = 1000;
+  const batchSize = parseInt(process.env.BATCH_SIZE || '1000', 10);
 
   await processData(
     siteModel,
