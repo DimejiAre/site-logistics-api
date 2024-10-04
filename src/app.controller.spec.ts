@@ -15,8 +15,12 @@ describe('AppController', () => {
   });
 
   describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
+    it('should return object with api status', () => {
+      expect(appController.getRoot()).toEqual({
+        message: 'Welcome to the Site Logistics API',
+        version: '0.0.1',
+        status: 'Running',
+      });
     });
   });
 });
