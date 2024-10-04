@@ -1,4 +1,7 @@
-require('dotenv').config(); // eslint-disable-line @typescript-eslint/no-require-imports
+/* eslint-disable @typescript-eslint/no-require-imports */
+require('dotenv').config({
+  path: `.env.${process.env.NODE_ENV || 'development'}`,
+});
 
 module.exports = {
   development: {

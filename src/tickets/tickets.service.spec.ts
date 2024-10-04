@@ -167,7 +167,6 @@ describe('TicketsService', () => {
       // ticketModelMock.findOne.mockResolvedValueOnce({ id: 1 });
       ticketModelMock.findOne.mockReturnValue({ id: 1 });
 
-      console.log(validCreateTicketDto);
       const result = await service.createTickets(truckId, validCreateTicketDto);
 
       expect(result).toEqual({

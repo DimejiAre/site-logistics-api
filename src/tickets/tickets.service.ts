@@ -28,7 +28,7 @@ export class TicketsService {
     private sequelize: Sequelize,
   ) {
     this.minDispatchIntervalMinutes =
-      parseInt(process.env.MIN_DISPATCH_INTERVAL_MINUTES, 10) || 15;
+      parseInt(process.env.MIN_DISPATCH_INTERVAL_MINUTES, 10) || 30;
   }
 
   async createTickets(
