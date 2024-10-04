@@ -1,4 +1,12 @@
-import { Controller, Post, Body, Param, ParseArrayPipe } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Param,
+  ParseArrayPipe,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { TicketsService } from '../tickets/tickets.service';
 import { CreateTicketDto } from '../tickets/dto/create-ticket.dto';
 import { CreateTicketsResponse } from '../tickets/dto/response.dto';
@@ -26,7 +34,7 @@ export class TrucksController {
     type: CreateTicketsResponse,
   })
   @ApiBody({ type: [CreateTicketDto] })
-  createTickets(
+  async createTickets(
     @Param('id') truckId: number,
     @Body(
       new ParseArrayPipe({
@@ -37,6 +45,17 @@ export class TrucksController {
     )
     createTicketDtos: CreateTicketDto[],
   ): Promise<CreateTicketsResponse> {
-    return this.ticketService.createTickets(truckId, createTicketDtos);
+    const result = await this.ticketService.createTickets(
+      truckId,
+      createTicketDtos,
+    );
+
+    if (result.createdCount === createTicketDtos.length) {
+      return result;
+    } else if (result.createdCount > 0 && result.failedCount > 0) {
+      throw new HttpException(result, HttpStatus.PARTIAL_CONTENT);
+    } else {
+      throw new HttpException(result, HttpStatus.BAD_REQUEST);
+    }
   }
 }

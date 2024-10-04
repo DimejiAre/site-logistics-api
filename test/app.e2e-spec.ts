@@ -62,9 +62,11 @@ describe('AppController (e2e)', () => {
   describe('Trucks', () => {
     it('/trucks/:id/tickets (POST)', async () => {
       const truckId = truck.id;
+      const now = new Date();
+      now.setHours(now.getHours() + 2);
       const createTicketDtos = [
         {
-          dispatchTime: new Date().toISOString(),
+          dispatchTime: now.toISOString(),
           material: 'soil',
         },
       ];
@@ -105,7 +107,7 @@ describe('AppController (e2e)', () => {
             dispatchTime: ticket.dispatchTime.toISOString(),
           }),
         ]),
-        count: 1,
+        count: 2,
         totalPages: 1,
       });
     });
