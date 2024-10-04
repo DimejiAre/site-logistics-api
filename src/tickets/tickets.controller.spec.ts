@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { TicketsController } from './tickets.controller';
 import { TicketsService } from './tickets.service';
 import { GetTicketsDto } from './dto/get-tickets.dto';
-import { TicketResponse } from './interfaces/ticket-interface';
+import { TicketResponse } from './dto/response.dto';
 
 describe('TicketsController', () => {
   let controller: TicketsController;

@@ -8,10 +8,7 @@ import { Truck } from '../trucks/trucks.model';
 import { Ticket } from './tickets.model';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { BadRequestException, Logger } from '@nestjs/common';
-import {
-  TicketResponse,
-  CreateTicketsResponse,
-} from './interfaces/ticket-interface';
+import { TicketResponse, CreateTicketsResponse } from './dto/response.dto';
 
 describe('TicketsService', () => {
   let service: TicketsService;
@@ -176,7 +173,7 @@ describe('TicketsService', () => {
           {
             dto: validCreateTicketDto[0],
             reason:
-              'There must be at least 15 minutes between dispatch times for the same truck.',
+              'There must be at least 30 minutes between dispatch times for the same truck.',
           },
         ],
       });

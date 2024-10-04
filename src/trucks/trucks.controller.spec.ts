@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { TrucksController } from './trucks.controller';
 import { TicketsService } from '../tickets/tickets.service';
 import { CreateTicketDto } from '../tickets/dto/create-ticket.dto';
-import { CreateTicketsResponse } from '../tickets/interfaces/ticket-interface';
+import { CreateTicketsResponse } from '../tickets/dto/response.dto';
 
 describe('TrucksController', () => {
   let controller: TrucksController;

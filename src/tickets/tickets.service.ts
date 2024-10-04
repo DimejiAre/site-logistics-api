@@ -12,7 +12,7 @@ import {
   TicketResponse,
   CreateTicketsResponse,
   FailedTicket,
-} from './interfaces/ticket-interface';
+} from './dto/response.dto';
 import { Sequelize } from 'sequelize-typescript';
 import { Op } from 'sequelize';
 import { CreateTicketDto } from './dto/create-ticket.dto';

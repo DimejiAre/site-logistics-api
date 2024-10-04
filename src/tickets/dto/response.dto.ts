@@ -1,6 +1,6 @@
-import { CreateTicketDto } from '../dto/create-ticket.dto';
+import { CreateTicketDto } from './create-ticket.dto';
 
-export interface TicketResponse {
+export class TicketResponse {
   id: number;
   ticketNumber: number;
   dispatchTime: Date;
@@ -9,13 +9,13 @@ export interface TicketResponse {
   siteName: string;
   siteId: number;
 }
-export interface CreateTicketsResponse {
+export class CreateTicketsResponse {
   createdCount: number;
   failedCount: number;
   failedTickets: FailedTicket[];
 }
 
-export interface FailedTicket {
+export class FailedTicket {
   dto: CreateTicketDto;
   reason: string;
 }
