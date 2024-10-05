@@ -40,9 +40,7 @@ describe('TrucksController', () => {
     let result: CreateTicketsResponse;
 
     beforeEach(async () => {
-      const now = new Date();
-      now.setHours(now.getHours() + 2);
-      const dispatchTime = now.toISOString();
+      const dispatchTime = new Date().toISOString();
 
       createValidTicketDtos = [
         {

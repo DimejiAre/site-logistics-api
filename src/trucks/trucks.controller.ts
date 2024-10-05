@@ -17,7 +17,7 @@ import { ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 export class TrucksController {
   constructor(private ticketService: TicketsService) {}
 
-  @Post(':id/tickets')
+  @Post(':id/tickets/bulk_create')
   @ApiOperation({ summary: 'Bulk creates tickets for a specified truck' })
   @ApiResponse({
     status: 201,

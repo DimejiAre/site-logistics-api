@@ -70,9 +70,7 @@ describe('TicketsService', () => {
   });
 
   describe('createTickets', () => {
-    const now = new Date();
-    now.setHours(now.getHours() + 2);
-    const dispatchTime = now.toISOString();
+    const dispatchTime = new Date().toISOString();
     const truckId = 1;
     const validCreateTicketDto: CreateTicketDto[] = [{ dispatchTime }];
     const ticket: Ticket = {
@@ -129,7 +127,7 @@ describe('TicketsService', () => {
       });
     });
 
-    it('should fail with reason if dispatchTime not on the current day', async () => {
+    it('should fail with reason if dispatchTime is in the future', async () => {
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
       const invalidDto = [{ dispatchTime: tomorrow.toISOString() }];
@@ -143,7 +141,7 @@ describe('TicketsService', () => {
         failedTickets: [
           {
             dto: { dispatchTime: tomorrow.toISOString() },
-            reason: 'Dispatch time must be on the current day.',
+            reason: 'Dispatch time cannot be in the future.',
           },
         ],
       });
@@ -190,11 +188,11 @@ describe('TicketsService', () => {
     });
 
     it('should return correct failed count if multiple invalid tickets', async () => {
-      const pastTime = new Date();
-      pastTime.setHours(pastTime.getHours() - 2);
+      const futureTime = new Date();
+      futureTime.setHours(futureTime.getHours() + 2);
       const invalidDtos = [
         { dispatchTime: 'invalid-date' },
-        { dispatchTime: pastTime.toISOString() },
+        { dispatchTime: futureTime.toISOString() },
       ];
 
       truckModelMock.findByPk.mockResolvedValueOnce({ siteId: 1 });
@@ -210,8 +208,8 @@ describe('TicketsService', () => {
             reason: 'Invalid dispatchTime date.',
           },
           {
-            dto: { dispatchTime: pastTime.toISOString() },
-            reason: 'Dispatch time cannot be in the past.',
+            dto: { dispatchTime: futureTime.toISOString() },
+            reason: 'Dispatch time cannot be in the future.',
           },
         ],
       });

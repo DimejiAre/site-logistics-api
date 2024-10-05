@@ -25,6 +25,10 @@ describe('AppController (e2e)', () => {
     await sequelize.sync({ force: true });
     await app.init();
 
+    await Ticket.destroy({ where: {} });
+    await Truck.destroy({ where: {} });
+    await Site.destroy({ where: {} });
+
     site = await Site.create({
       name: 'Test Site',
     });
@@ -44,26 +48,23 @@ describe('AppController (e2e)', () => {
   });
 
   afterAll(async () => {
-    await Ticket.destroy({ where: {} });
-    await Truck.destroy({ where: {} });
-    await Site.destroy({ where: {} });
     await sequelize.close();
     await app.close();
   });
 
   describe('Trucks', () => {
-    it('/trucks/:id/tickets (POST)', async () => {
+    it('/trucks/:id/tickets/bulk_create (POST)', async () => {
       const truckId = truck.id;
-      const now = new Date();
-      now.setHours(now.getHours() + 2);
+      const dispatchTime = new Date();
+      dispatchTime.setHours(dispatchTime.getHours() - 2);
       const createTicketDtos = [
         {
-          dispatchTime: now.toISOString(),
+          dispatchTime: dispatchTime.toISOString(),
         },
       ];
 
       const response = await request(app.getHttpServer())
-        .post(`/trucks/${truckId}/tickets`)
+        .post(`/trucks/${truckId}/tickets/bulk_create`)
         .send(createTicketDtos)
         .expect(201);
 

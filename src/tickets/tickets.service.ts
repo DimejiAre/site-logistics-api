@@ -167,21 +167,11 @@ export class TicketsService {
     }
 
     const now = new Date();
-    if (
-      dispatchTime.getUTCFullYear() !== now.getUTCFullYear() ||
-      dispatchTime.getUTCMonth() !== now.getUTCMonth() ||
-      dispatchTime.getUTCDate() !== now.getUTCDate()
-    ) {
-      return {
-        valid: false,
-        reason: 'Dispatch time must be on the current day.',
-      };
-    }
 
-    if (dispatchTime.getTime() < now.getTime()) {
+    if (dispatchTime.getTime() > now.getTime()) {
       return {
         valid: false,
-        reason: 'Dispatch time cannot be in the past.',
+        reason: 'Dispatch time cannot be in the future.',
       };
     }
 
