@@ -6,6 +6,7 @@ import {
   ParseArrayPipe,
   HttpException,
   HttpStatus,
+  BadRequestException,
 } from '@nestjs/common';
 import { TicketsService } from '../tickets/tickets.service';
 import { CreateTicketDto } from '../tickets/dto/create-ticket.dto';
@@ -45,6 +46,10 @@ export class TrucksController {
     )
     createTicketDtos: CreateTicketDto[],
   ): Promise<CreateTicketsResponse> {
+    if (!createTicketDtos || createTicketDtos.length === 0) {
+      throw new BadRequestException('Request body cannot be an empty array');
+    }
+
     const result = await this.ticketService.createTickets(
       truckId,
       createTicketDtos,
