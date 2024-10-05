@@ -104,7 +104,7 @@ export class TicketsService {
     }
   }
 
-  async findTickets(
+  async getTickets(
     siteIds?: number[],
     startDate?: Date,
     endDate?: Date,

@@ -11,7 +11,7 @@ describe('TrucksController', () => {
 
   const mockTicketsService = {
     createTickets: jest.fn(),
-    findTickets: jest.fn(),
+    getTickets: jest.fn(),
   };
 
   beforeEach(async () => {

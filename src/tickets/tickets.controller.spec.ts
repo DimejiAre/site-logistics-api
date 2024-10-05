@@ -10,7 +10,7 @@ describe('TicketsController', () => {
 
   const mockTicketsService = {
     createTickets: jest.fn(),
-    findTickets: jest.fn(),
+    getTickets: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -70,13 +70,13 @@ describe('TicketsController', () => {
         totalPages: 1,
       };
 
-      mockTicketsService.findTickets.mockResolvedValue(mockResponse);
+      mockTicketsService.getTickets.mockResolvedValue(mockResponse);
 
       result = await controller.getTickets(getTicketsDto);
     });
 
-    it('should call TicketsService.findTickets with correct arguments in the right format', async () => {
-      expect(service.findTickets).toHaveBeenCalledWith(
+    it('should call TicketsService.getTickets with correct arguments in the right format', async () => {
+      expect(service.getTickets).toHaveBeenCalledWith(
         [1, 2],
         new Date(startDate),
         new Date(endDate),
@@ -85,13 +85,13 @@ describe('TicketsController', () => {
       );
     });
 
-    it('should return the correct output from TicketsService.findTickets', async () => {
+    it('should return the correct output from TicketsService.getTickets', async () => {
       expect(result).toEqual(mockResponse);
     });
 
     it('should throw HttpException if service throws an unexpected error', async () => {
       const error = new Error('Unexpected error');
-      mockTicketsService.findTickets.mockRejectedValueOnce(error);
+      mockTicketsService.getTickets.mockRejectedValueOnce(error);
 
       await expect(controller.getTickets({})).rejects.toThrow(error);
     });

@@ -216,7 +216,7 @@ describe('TicketsService', () => {
     });
   });
 
-  describe('findTickets', () => {
+  describe('getTickets', () => {
     const dispatchTime = new Date();
     const mockTickets = [
       {
@@ -251,7 +251,7 @@ describe('TicketsService', () => {
         count: 1,
       });
 
-      const result = await service.findTickets(
+      const result = await service.getTickets(
         [1],
         new Date(),
         new Date(),
@@ -271,7 +271,7 @@ describe('TicketsService', () => {
         count: 1,
       });
 
-      await service.findTickets([1], startDate, endDate, 1, 10);
+      await service.getTickets([1], startDate, endDate, 1, 10);
 
       expect(ticketModelMock.findAndCountAll).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -291,7 +291,7 @@ describe('TicketsService', () => {
         count: 100,
       });
 
-      const result = await service.findTickets(
+      const result = await service.getTickets(
         [],
         new Date(),
         new Date(),
@@ -314,7 +314,7 @@ describe('TicketsService', () => {
         count: 0,
       });
 
-      const result = await service.findTickets([], new Date(), new Date());
+      const result = await service.getTickets([], new Date(), new Date());
 
       expect(result.data).toHaveLength(0);
       expect(result.count).toBe(0);
@@ -324,7 +324,7 @@ describe('TicketsService', () => {
       ticketModelMock.findAndCountAll.mockRejectedValueOnce(new Error());
 
       await expect(
-        service.findTickets([], new Date(), new Date()),
+        service.getTickets([], new Date(), new Date()),
       ).rejects.toThrow(Error);
 
       expect(Logger.prototype.error).toHaveBeenCalledWith(

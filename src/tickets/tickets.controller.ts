@@ -19,7 +19,7 @@ export class TicketsController {
     getTicketsDto: GetTicketsDto,
   ): Promise<{ data: TicketResponse[]; count: number; totalPages: number }> {
     const { siteIds, startDate, endDate, page, limit } = getTicketsDto;
-    return this.ticketsService.findTickets(
+    return this.ticketsService.getTickets(
       siteIds,
       startDate ? new Date(startDate) : undefined,
       endDate ? new Date(endDate) : undefined,
