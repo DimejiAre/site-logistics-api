@@ -44,8 +44,8 @@ describe('TicketsController', () => {
     let endDate: string;
 
     beforeEach(async () => {
-      startDate = '2024-09-30T17:00:00.000Z';
-      endDate = '2024-09-30T18:00:00.000Z';
+      startDate = new Date().toISOString();
+      endDate = new Date().toISOString();
 
       getTicketsDto = {
         siteIds: [1, 2],
@@ -87,6 +87,13 @@ describe('TicketsController', () => {
 
     it('should return the correct output from TicketsService.findTickets', async () => {
       expect(result).toEqual(mockResponse);
+    });
+
+    it('should throw HttpException if service throws an unexpected error', async () => {
+      const error = new Error('Unexpected error');
+      mockTicketsService.findTickets.mockRejectedValueOnce(error);
+
+      await expect(controller.getTickets({})).rejects.toThrow(error);
     });
   });
 });

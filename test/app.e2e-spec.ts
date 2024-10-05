@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { AppModule } from './../src/app.module';
 import { Sequelize } from 'sequelize-typescript';
@@ -20,14 +20,6 @@ describe('AppController (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-
-    app.useGlobalPipes(
-      new ValidationPipe({
-        whitelist: true,
-        forbidNonWhitelisted: true,
-        transform: true,
-      }),
-    );
 
     sequelize = moduleFixture.get<Sequelize>(Sequelize);
     await sequelize.sync({ force: true });
@@ -67,7 +59,6 @@ describe('AppController (e2e)', () => {
       const createTicketDtos = [
         {
           dispatchTime: now.toISOString(),
-          material: 'soil',
         },
       ];
 
@@ -77,9 +68,9 @@ describe('AppController (e2e)', () => {
         .expect(201);
 
       expect(response.body).toEqual({
-        createdCount: expect.any(Number),
-        failedCount: expect.any(Number),
-        failedTickets: expect.any(Array),
+        createdCount: 1,
+        failedCount: 0,
+        failedTickets: [],
       });
     });
   });

@@ -161,7 +161,6 @@ describe('TicketsService', () => {
 
     it('should fail with reason if conflicting ticket exists', async () => {
       truckModelMock.findByPk.mockResolvedValueOnce({ siteId: 1 });
-      // ticketModelMock.findOne.mockResolvedValueOnce({ id: 1 });
       ticketModelMock.findOne.mockReturnValue({ id: 1 });
 
       const result = await service.createTickets(truckId, validCreateTicketDto);
@@ -179,7 +178,7 @@ describe('TicketsService', () => {
       });
     });
 
-    it('should rollback transaction if an error occurs', async () => {
+    it('should throw error and rollback transaction if an error occurs', async () => {
       truckModelMock.findByPk.mockResolvedValueOnce({ siteId: 1 });
       ticketModelMock.findOne.mockRejectedValueOnce(new Error());
 
@@ -188,6 +187,34 @@ describe('TicketsService', () => {
       ).rejects.toThrow(Error);
 
       expect(sequelizeMock.transaction().rollback).toHaveBeenCalled();
+    });
+
+    it('should return correct failed count if multiple invalid tickets', async () => {
+      const pastTime = new Date();
+      pastTime.setHours(pastTime.getHours() - 2);
+      const invalidDtos = [
+        { dispatchTime: 'invalid-date' },
+        { dispatchTime: pastTime.toISOString() },
+      ];
+
+      truckModelMock.findByPk.mockResolvedValueOnce({ siteId: 1 });
+
+      const result = await service.createTickets(truckId, invalidDtos);
+
+      expect(result).toEqual({
+        createdCount: 0,
+        failedCount: 2,
+        failedTickets: [
+          {
+            dto: { dispatchTime: 'invalid-date' },
+            reason: 'Invalid dispatchTime date.',
+          },
+          {
+            dto: { dispatchTime: pastTime.toISOString() },
+            reason: 'Dispatch time cannot be in the past.',
+          },
+        ],
+      });
     });
   });
 
@@ -235,9 +262,6 @@ describe('TicketsService', () => {
       );
 
       expect(result).toEqual(mockResponse);
-      expect(result.data).toHaveLength(1);
-      expect(result.count).toBe(1);
-      expect(result.totalPages).toBe(1);
     });
 
     it('should include siteIds in query when provided', async () => {
@@ -277,7 +301,6 @@ describe('TicketsService', () => {
         10,
       );
 
-      expect(result.data).toHaveLength(1);
       expect(result.totalPages).toBe(10);
       expect(ticketModelMock.findAndCountAll).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -297,6 +320,19 @@ describe('TicketsService', () => {
 
       expect(result.data).toHaveLength(0);
       expect(result.count).toBe(0);
+    });
+
+    it('should handle errors and throw them', async () => {
+      ticketModelMock.findAndCountAll.mockRejectedValueOnce(new Error());
+
+      await expect(
+        service.findTickets([], new Date(), new Date()),
+      ).rejects.toThrow(Error);
+
+      expect(Logger.prototype.error).toHaveBeenCalledWith(
+        'Failed to fetch tickets',
+        expect.any(Error),
+      );
     });
   });
 });

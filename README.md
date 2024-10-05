@@ -30,29 +30,35 @@ These instructions will help you set up the project on your local machine for de
 1. Clone the repository:
    ```bash
    git clone https://github.com/DimejiAre/site-logistics-api.git
-   cd yourproject
+   cd site-logistics-api
    ```
 
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Configure environment variables:
+2. Configure environment variables:
    - Update `.env.development` and `.env.local` with your PostgreSQL username and password.
 
-4. Set up the project:
+3. Set up the project:
    ```bash
    npm run setup
    ```
+   This command will:
+   - Install dependencies
+   - Create development and test databases
+   - Run migrations
+   - Import the sites and trucks JSON files
 
 ## Usage
 
-To start the project in development mode, run: npm run start:dev
+To start the project in development mode, run: 
+   ```bash
+   npm run start:dev
+   ```
 
 ## Running Tests
 
-To run the full test suite, including unit and integration tests, use the following command: npm run test:all
+To run the full test suite, including unit and integration tests, use the following command:
+   ```bash
+   npm run test:all
+   ```
 
 ## Documentation
 
