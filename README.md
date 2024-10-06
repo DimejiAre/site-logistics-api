@@ -2,6 +2,8 @@
 
 Site Logistics API
 
+Live Link: https://site-logistics-api.onrender.com/api
+
 ## Table of Contents
 
 - [About](#about)
@@ -22,7 +24,7 @@ These instructions will help you set up the project on your local machine for de
 
 ### Prerequisites
 
-- **Node.js**: It is recommended to use Node v22. You can find installation instructions [here](https://nodejs.org/en/download/package-manager)
+- **Node.js**: It is highly recommended to use Node v22. You can find installation instructions [here](https://nodejs.org/en/download/package-manager)
 - **PostgreSQL**: Ensure PostgreSQL is installed and running on your machine. Installation details are available [here](https://www.postgresql.org/download/)
 
 ### Project Installation
@@ -63,3 +65,5 @@ To run the full test suite, including unit and integration tests, use the follow
 ## Documentation
 
 The documentation and hosted version of the project can be found [here](https://site-logistics-api.onrender.com/api).
+
+Please note that it may take up to a minute for the application to cold start.”
