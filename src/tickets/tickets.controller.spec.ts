@@ -33,12 +33,8 @@ describe('TicketsController', () => {
   });
 
   describe('getTickets', () => {
-    let result: { data: TicketResponse[]; count: number; totalPages: number };
-    let mockResponse: {
-      data: TicketResponse[];
-      count: number;
-      totalPages: number;
-    };
+    let result: TicketResponse;
+    let mockResponse: TicketResponse;
     let getTicketsDto: GetTicketsDto;
     let startDate: string;
     let endDate: string;
@@ -62,12 +58,15 @@ describe('TicketsController', () => {
             ticketNumber: 123,
             dispatchTime: new Date(),
             material: 'soil',
+            siteId: 1,
             siteName: 'ZILCH',
             truckLicense: 'kdd7yh',
-          } as TicketResponse,
+          },
         ],
-        count: 1,
+        totalItems: 1,
         totalPages: 1,
+        limit: 10,
+        page: 1,
       };
 
       mockTicketsService.getTickets.mockResolvedValue(mockResponse);

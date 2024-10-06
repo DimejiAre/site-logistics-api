@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import request from 'supertest';
 import { AppModule } from './../src/app.module';
 import { Sequelize } from 'sequelize-typescript';
@@ -20,6 +20,14 @@ describe('AppController (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+
+    app.useGlobalPipes(
+      new ValidationPipe({
+        transform: true,
+        whitelist: true,
+        forbidNonWhitelisted: true,
+      }),
+    );
 
     sequelize = moduleFixture.get<Sequelize>(Sequelize);
     await sequelize.sync({ force: true });
@@ -99,8 +107,10 @@ describe('AppController (e2e)', () => {
             dispatchTime: ticket.dispatchTime.toISOString(),
           }),
         ]),
-        count: 2,
+        totalItems: 2,
         totalPages: 1,
+        limit: 10,
+        page: 1,
       });
     });
   });

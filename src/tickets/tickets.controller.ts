@@ -17,7 +17,7 @@ export class TicketsController {
   getTickets(
     @Query()
     getTicketsDto: GetTicketsDto,
-  ): Promise<{ data: TicketResponse[]; count: number; totalPages: number }> {
+  ): Promise<TicketResponse> {
     const { siteIds, startDate, endDate, page, limit } = getTicketsDto;
     return this.ticketsService.getTickets(
       siteIds,

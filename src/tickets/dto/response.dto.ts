@@ -1,6 +1,6 @@
 import { CreateTicketDto } from './create-ticket.dto';
 
-export class TicketResponse {
+class Ticket {
   id: number;
   ticketNumber: number;
   dispatchTime: Date;
@@ -18,4 +18,12 @@ export class CreateTicketsResponse {
 export class FailedTicket {
   dto: CreateTicketDto;
   reason: string;
+}
+
+export class TicketResponse {
+  data: Ticket[];
+  limit: number;
+  totalPages: number;
+  page: number;
+  totalItems: number;
 }

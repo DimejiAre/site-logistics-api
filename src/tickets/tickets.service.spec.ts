@@ -229,7 +229,7 @@ describe('TicketsService', () => {
         truck: { license: 'kdd7yh' },
       },
     ];
-    const mockResponse = {
+    const mockResponse: TicketResponse = {
       data: [
         {
           id: 1,
@@ -239,10 +239,12 @@ describe('TicketsService', () => {
           siteId: 1,
           siteName: 'ZILCH',
           truckLicense: 'kdd7yh',
-        } as TicketResponse,
+        },
       ],
-      count: 1,
+      totalItems: 1,
       totalPages: 1,
+      limit: 10,
+      page: 1,
     };
 
     it('should find and return tickets', async () => {
@@ -300,6 +302,9 @@ describe('TicketsService', () => {
       );
 
       expect(result.totalPages).toBe(10);
+      expect(result.totalItems).toBe(100);
+      expect(result.page).toBe(2);
+      expect(result.limit).toBe(10);
       expect(ticketModelMock.findAndCountAll).toHaveBeenCalledWith(
         expect.objectContaining({
           limit: 10,
@@ -317,7 +322,7 @@ describe('TicketsService', () => {
       const result = await service.getTickets([], new Date(), new Date());
 
       expect(result.data).toHaveLength(0);
-      expect(result.count).toBe(0);
+      expect(result.totalItems).toBe(0);
     });
 
     it('should handle errors and throw them', async () => {

@@ -110,7 +110,7 @@ export class TicketsService {
     endDate?: Date,
     page = 1,
     limit = 100,
-  ): Promise<{ data: TicketResponse[]; count: number; totalPages: number }> {
+  ): Promise<TicketResponse> {
     try {
       const offset = (page - 1) * limit;
 
@@ -149,7 +149,13 @@ export class TicketsService {
 
       const totalPages = Math.ceil(count / limit);
 
-      return { data: transformedRows, count, totalPages };
+      return {
+        data: transformedRows,
+        totalItems: count,
+        totalPages,
+        limit,
+        page,
+      };
     } catch (error) {
       this.logger.error('Failed to fetch tickets', error);
       throw error;
