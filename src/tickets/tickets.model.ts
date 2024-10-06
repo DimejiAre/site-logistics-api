@@ -31,7 +31,7 @@ export class Ticket extends Model {
 
   @Default('soil')
   @AllowNull(false)
-  @Column(DataType.STRING) //make enum?
+  @Column(DataType.STRING)
   material: string;
 
   @ForeignKey(() => Truck)
