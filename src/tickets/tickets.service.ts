@@ -107,7 +107,7 @@ export class TicketsService {
   async getTickets(
     siteIds?: number[],
     startDate?: Date,
-    endDate?: Date,
+    endDate: Date = new Date(),
     page = 1,
     limit = 100,
   ): Promise<TicketResponse> {
