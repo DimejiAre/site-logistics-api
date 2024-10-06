@@ -7,7 +7,7 @@ Site Logistics API
 - [About](#about)
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
+  - [Project Installation](#project-installation)
 - [Usage](#usage)
 - [Running Tests](#running-tests)
 - [Documentation](#documentation)
@@ -22,10 +22,10 @@ These instructions will help you set up the project on your local machine for de
 
 ### Prerequisites
 
-- **Node.js**: It is recommended to use Node v22.
-- **PostgreSQL**: Ensure PostgreSQL is installed on your machine.
+- **Node.js**: It is recommended to use Node v22. You can find installation instructions [here](https://nodejs.org/en/download/package-manager)
+- **PostgreSQL**: Ensure PostgreSQL is installed and running on your machine. Installation details are available [here](https://www.postgresql.org/download/)
 
-### Installation
+### Project Installation
 
 1. Clone the repository:
    ```bash
