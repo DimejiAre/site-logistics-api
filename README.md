@@ -12,6 +12,7 @@ Live Link: https://site-logistics-api.onrender.com/api
   - [Project Installation](#project-installation)
 - [Usage](#usage)
 - [Running Tests](#running-tests)
+- [Api Endpoints](#api-endpoints)
 - [Documentation](#documentation)
 
 ## About
@@ -32,13 +33,17 @@ These instructions will help you set up the project on your local machine for de
 1. Clone the repository:
    ```bash
    git clone https://github.com/DimejiAre/site-logistics-api.git
+   ```
+
+2. Navigate into the project folder
+   ``` bash
    cd site-logistics-api
    ```
 
-2. Configure environment variables:
+3. Configure environment variables:
    - Update `.env.development` and `.env.local` with your PostgreSQL username and password.
 
-3. Set up the project:
+4. Set up the project:
    ```bash
    npm run setup
    ```
@@ -54,6 +59,7 @@ To start the project in development mode, run:
    ```bash
    npm run start:dev
    ```
+The default port is: 3000
 
 ## Running Tests
 
@@ -62,8 +68,32 @@ To run the full test suite, including unit and integration tests, use the follow
    npm run test:all
    ```
 
+## API Endpoints
+
+Below are the main API endpoints available in the Site Logistics API.
+
+### Trucks
+
+- **POST /trucks/:id/tickets/bulk_create**  
+  Bulk creates tickets for a specific truck, identified by the truck's ID (`:id`).
+
+  **Request Body:**
+  ```json
+  [
+    {
+      "dispatchTime": "string (ISO 8601 format)",  // Required
+      "material": "string"                         // Optional
+    }
+  ]
+  ```
+
+### Tickets
+
+- **GET /tickets**  
+  Fetches tickets with optional filters like siteIds, startDate, endDate, page, and limit.
+
 ## Documentation
 
-The documentation and hosted version of the project can be found [here](https://site-logistics-api.onrender.com/api).
+The full documentation and hosted version of the project can be found [here](https://site-logistics-api.onrender.com/api).
 
 Please note that it may take up to a minute for the application to cold start.”
