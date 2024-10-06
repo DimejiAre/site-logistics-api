@@ -96,4 +96,4 @@ Below are the main API endpoints available in the Site Logistics API.
 
 The full documentation and hosted version of the project can be found [here](https://site-logistics-api.onrender.com/api).
 
-Please note that it may take up to a minute for the application to cold start.”
+Please note that it may take up to a minute for the application to cold start.
